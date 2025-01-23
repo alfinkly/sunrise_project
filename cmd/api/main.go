@@ -12,6 +12,7 @@ import (
 	"sunrise_project/internal/platform"
 	"sunrise_project/internal/repository"
 	"sunrise_project/internal/service"
+
 	"time"
 )
 
@@ -22,10 +23,10 @@ func main() {
 	}
 
 	var db *gorm.DB
-	for i := 0; i < 5; i++ { // Попробуем подключиться несколько раз с задержкой
+	for i := 0; i < 5; i++ {
 		db, err = platform.NewPostgresDB()
 		if err == nil {
-			break // Успешно подключились, выходим из цикла
+			break
 		}
 		log.Printf("Failed to connect to database: %v, retrying in 5 seconds...", err)
 		time.Sleep(5 * time.Second)
@@ -33,6 +34,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to Migrate Database: %s", err)
 	}
+
 	err = db.AutoMigrate(&dao.Location{})
 	if err != nil {
 		log.Fatalf("Failed to Migrate Database: %s", err)
@@ -50,7 +52,6 @@ func main() {
 	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
 	r.Use(cors.New(config))
 
-	r.GET("/location", locationHandler.GetLocationByIP)
 	r.GET("/location/:ip", locationHandler.GetLocationByCustomIP)
 	r.GET("/locations", locationHandler.GetAllLocations)
 	r.GET("/", secretHandler.GetSecretValue)

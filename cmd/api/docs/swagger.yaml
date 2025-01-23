@@ -1,0 +1,11 @@
+basePath: /
+host: localhost:8080
+info:
+  contact: {}
+  description: This API provides geolocation information based on IP address.
+  title: Geolocation Service API
+  version: "1.0"
+paths: {}
+schemes:
+- http
+swagger: "2.0"

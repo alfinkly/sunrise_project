@@ -27,12 +27,10 @@ func (r *LocationRepository) GetByIP(ip string) (*dao.Location, error) {
 	return &location, nil
 }
 
-// Create создает новую запись в БД.
 func (r *LocationRepository) Create(location *dao.Location) error {
 	return r.db.Create(location).Error
 }
 
-// GetAll получает все записи из БД
 func (r *LocationRepository) GetAll() ([]dao.Location, error) {
 	var locations []dao.Location
 	result := r.db.Find(&locations)

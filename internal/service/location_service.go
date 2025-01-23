@@ -65,7 +65,6 @@ func (s *LocationService) GetLocationByIP(ip string) (*dao.Location, error) {
 		City:    ipInfoResponse.City,
 	}
 
-	// Сохраняем в БД
 	err = s.repo.Create(location)
 	if err != nil {
 		log.Printf("Failed to save location to DB: %v", err)
@@ -74,7 +73,6 @@ func (s *LocationService) GetLocationByIP(ip string) (*dao.Location, error) {
 	return location, nil
 }
 
-// GetAllLocations получает все записи из БД
 func (s *LocationService) GetAllLocations() ([]dao.Location, error) {
 	return s.repo.GetAll()
 }

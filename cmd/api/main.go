@@ -1,17 +1,18 @@
 package main
 
 import (
-	"crypto/aes"
-	"crypto/cipher"
-	"encoding/base64"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"io/ioutil"
+	"gorm.io/gorm"
 	"log"
-	"net/http"
 	"os"
+	"sunrise_project/internal/dao"
+	"sunrise_project/internal/handler"
 	"sunrise_project/internal/platform"
 	"sunrise_project/internal/repository"
+	"sunrise_project/internal/service"
+	"time"
 )
 
 func main() {
@@ -20,65 +21,46 @@ func main() {
 		log.Println("Warning: Error loading .env file, using environment variables instead")
 	}
 
-	db, err := platform.NewPostgresDB()
-	if err != nil {
-		log.Fatalf("Failed to connect: %s", err)
+	var db *gorm.DB
+	for i := 0; i < 5; i++ { // Попробуем подключиться несколько раз с задержкой
+		db, err = platform.NewPostgresDB()
+		if err == nil {
+			break // Успешно подключились, выходим из цикла
+		}
+		log.Printf("Failed to connect to database: %v, retrying in 5 seconds...", err)
+		time.Sleep(5 * time.Second)
 	}
-	err = db.AutoMigrate(&repository.Location{})
+	if err != nil {
+		log.Fatalf("Failed to Migrate Database: %s", err)
+	}
+	err = db.AutoMigrate(&dao.Location{})
 	if err != nil {
 		log.Fatalf("Failed to Migrate Database: %s", err)
 	}
 
-	key := []byte("dog-alfinkly-bird-apple-taxa-dot")
+	locationRepo := repository.NewLocationRepository(db)
+	locationService := service.NewLocationService(locationRepo)
+	locationHandler := handler.NewLocationHandler(locationService)
+	secretHandler := handler.NewSecretHandler()
 
-	encodedCiphertext, err := ioutil.ReadFile("secret_data.txt")
-	if err != nil {
-		log.Fatalf("Failed to read file: %v", err)
-	}
+	r := gin.Default()
 
-	ciphertext, err := base64.StdEncoding.DecodeString(string(encodedCiphertext))
-	if err != nil {
-		log.Fatalf("Failed to decode base64: %v", err)
-	}
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"http://localhost"}
+	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
+	r.Use(cors.New(config))
 
-	decryptedText, err := decrypt(ciphertext, key)
-	if err != nil {
-		log.Fatalf("Failed to decrypt: %v", err)
-	}
-
-	router := gin.Default()
-	router.GET("/", func(c *gin.Context) {
-		c.String(http.StatusOK, decryptedText)
-	})
+	r.GET("/location", locationHandler.GetLocationByIP)
+	r.GET("/location/:ip", locationHandler.GetLocationByCustomIP)
+	r.GET("/locations", locationHandler.GetAllLocations)
+	r.GET("/", secretHandler.GetSecretValue)
 
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
 	log.Printf("Starting server on port - %s", port)
-	if err := router.Run(":" + port); err != nil {
+	if err := r.Run(":" + port); err != nil {
 		log.Fatalf("Failed to start server: %s", err)
 	}
-}
-
-func decrypt(ciphertext []byte, key []byte) (string, error) {
-	block, err := aes.NewCipher(key)
-	if err != nil {
-		return "", err
-	}
-
-	aesGCM, err := cipher.NewGCM(block)
-	if err != nil {
-		return "", err
-	}
-
-	nonceSize := aesGCM.NonceSize()
-	nonce, ciphertext := ciphertext[:nonceSize], ciphertext[nonceSize:]
-
-	plaintext, err := aesGCM.Open(nil, nonce, ciphertext, nil)
-	if err != nil {
-		return "", err
-	}
-
-	return string(plaintext), nil
 }

@@ -1,13 +1,189 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geolocation Service</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        form {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            margin: 0 5px;
+            border: 1px solid #ddd;
+        }
+
+        #location-result, #all-locations-result {
+            margin: 20px;
+            padding: 15px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f0f0f0;
+        }
+    </style>
+
 </head>
 <body>
+<h1>Geolocation Service</h1>
 
+<button id="get-location-btn">Get My Location</button>
+
+<form id="custom-ip-form">
+    <input type="text" id="custom-ip" placeholder="Enter IP address">
+    <button type="submit">Get Location</button>
+</form>
+
+    <button onclick="testIp('8.8.8.8')">Test Google DNS</button>
+    <button onclick="testIp('1.1.1.1')">Test Cloudflare DNS</button>
+    <button onclick="testIp('77.88.8.8')">Test Yandex DNS</button>
+
+
+<div id="location-result"></div>
+
+<button id="get-all-locations-btn">Get All Locations</button>
+<div id="all-locations-result"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const getLocationBtn = document.getElementById('get-location-btn');
+        const customIpForm = document.getElementById('custom-ip-form');
+        const locationResult = document.getElementById('location-result');
+        const allLocationsBtn = document.getElementById('get-all-locations-btn');
+        const allLocationsResult = document.getElementById('all-locations-result');
+
+        async function getClientIp() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                return data.ip;
+            } catch (error) {
+                console.error('Error getting client IP:', error);
+                return null;
+            }
+        }
+
+        getLocationBtn.addEventListener('click', async function() {
+            const clientIp = await getClientIp();
+            if (clientIp) {
+                fetch(`http://localhost:8080/location/${clientIp}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        locationResult.innerHTML = `
+                            <p>IP: ${data.ip}</p>
+                            <p>Country: ${data.country}</p>
+                            <p>City: ${data.city}</p>
+                        `;
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        locationResult.innerHTML = `<p>Error: ${error}</p>`;
+                    });
+            } else {
+                locationResult.innerHTML = `<p>Error: Could not get client IP</p>`;
+            }
+        });
+
+        customIpForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const customIp = document.getElementById('custom-ip').value;
+            fetch(`http://localhost:8080/location/${customIp}`)
+                .then(response => response.json())
+                .then(data => {
+                    locationResult.innerHTML = `
+                        <p>IP: ${data.ip}</p>
+                        <p>Country: ${data.country}</p>
+                        <p>City: ${data.city}</p>
+                    `;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    locationResult.innerHTML = `<p>Error: ${error}</p>`;
+                });
+        });
+
+        allLocationsBtn.addEventListener('click', function() {
+            fetch('http://localhost:8080/locations')
+                .then(response => response.json())
+                .then(data => {
+                    let tableContent = '<table><thead><tr><th>IP</th><th>Country</th><th>City</th></tr></thead><tbody>';
+                    data.forEach(location => {
+                        tableContent += `
+                            <tr>
+                                <td>${location.IP}</td>
+                                <td>${location.Country}</td>
+                                <td>${location.City}</td>
+                            </tr>
+                        `;
+                    });
+                    tableContent += '</tbody></table>';
+                    allLocationsResult.innerHTML = tableContent;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    allLocationsResult.innerHTML = `<p>Error: ${error}</p>`;
+                });
+        });
+    });
+
+    function testIp(ip) {
+        fetch(`http://localhost:8080/location/${ip}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('location-result').innerHTML = `
+                    <p>IP: ${data.ip}</p>
+                    <p>Country: ${data.country}</p>
+                    <p>City: ${data.city}</p>
+                `;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('location-result').innerHTML = `<p>Error: ${error}</p>`;
+            });
+    }
+</script>
 </body>
 </html>

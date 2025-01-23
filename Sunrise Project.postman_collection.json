@@ -1,0 +1,152 @@
+{
+	"info": {
+		"_postman_id": "5199bfd8-a675-40b7-9d47-2c0a40525653",
+		"name": "Sunrise Project",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27373644"
+	},
+	"item": [
+		{
+			"name": "Create location",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"ip\": \"185.185.185.185\",\r\n    \"country\": \"Russia\",\r\n    \"city\": \"Moscow\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/location",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"location"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create location Copy",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"ip\": \"185.185.185.185\",\r\n    \"country\": \"RussiaAAAA\",\r\n    \"city\": \"MoscowWWWWWW\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/location/185.185.185.185",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"location",
+						"185.185.185.185"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get location",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/location/185.185.185.185",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"location",
+						"185.185.185.185"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete location",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"ip\": \"185.185.185.185\",\r\n    \"country\": \"RussiaAAAA\",\r\n    \"city\": \"MoscowWWWWWW\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/location/185.185.185.185",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"location",
+						"185.185.185.185"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all locations",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/location/185.185.185.185",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"location",
+						"185.185.185.185"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "and...",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080"
+				}
+			},
+			"response": []
+		}
+	]
+}

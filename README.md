@@ -26,6 +26,9 @@ Create a `.env` file in the root directory of the project based on the `.env_tem
     * Frontend: http://localhost:80
     * API: http://localhost:8080
 
+3. You can test it with Postman
+   * Import to your work space [Sunrise Project.postman_collection.json](Sunrise%20Project.postman_collection.json)
+
 ## API Endpoints
 
 * `GET /location/:ip` - Get geolocation information for a specific IP address.

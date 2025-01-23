@@ -39,3 +39,25 @@ func (r *LocationRepository) GetAll() ([]dao.Location, error) {
 	}
 	return locations, nil
 }
+
+func (r *LocationRepository) Update(location *dao.Location) error {
+	result := r.db.Save(location)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
+}
+
+func (r *LocationRepository) Delete(ip string) error {
+	result := r.db.Where("ip = ?", ip).Delete(&dao.Location{})
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
+}

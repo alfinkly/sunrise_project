@@ -58,7 +58,6 @@ func (s *LocationService) GetLocationByIP(ip string) (*dao.Location, error) {
 		return nil, fmt.Errorf("decode response from IP API: %w", err)
 	}
 
-	// Преобразуем ответ от ipinfo.io в нашу модель
 	location = &dao.Location{
 		IP:      ipInfoResponse.IP,
 		Country: ipInfoResponse.Country,
@@ -75,4 +74,16 @@ func (s *LocationService) GetLocationByIP(ip string) (*dao.Location, error) {
 
 func (s *LocationService) GetAllLocations() ([]dao.Location, error) {
 	return s.repo.GetAll()
+}
+
+func (s *LocationService) CreateLocation(location *dao.Location) error {
+	return s.repo.Create(location)
+}
+
+func (s *LocationService) UpdateLocation(location *dao.Location) error {
+	return s.repo.Update(location)
+}
+
+func (s *LocationService) DeleteLocation(ip string) error {
+	return s.repo.Delete(ip)
 }

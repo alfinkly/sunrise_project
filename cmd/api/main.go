@@ -55,6 +55,9 @@ func main() {
 	r.GET("/location/:ip", locationHandler.GetLocationByCustomIP)
 	r.GET("/locations", locationHandler.GetAllLocations)
 	r.GET("/", secretHandler.GetSecretValue)
+	r.POST("/location", locationHandler.CreateLocation)
+	r.PUT("/location/:ip", locationHandler.UpdateLocation)
+	r.DELETE("/location/:ip", locationHandler.DeleteLocation)
 
 	port := os.Getenv("PORT")
 	if port == "" {
